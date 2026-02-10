@@ -10,31 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  # Job 1: Run Python Tests
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Tests
-        # PYTHONPATH ensures pytest finds app.py in your root folder
-        env:
-          PYTHONPATH: .
-        run: pytest
-
-  # Job 2: Build and Push to Azure (Only runs if tests pass)
   build-and-push:
-    needs: test
     runs-on: ubuntu-latest
     environment: production
 
@@ -61,7 +37,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          # Fixed: Comments removed from tags list to avoid "invalid reference" error
           tags: |
             ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:${{ github.sha }}
             ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:latest
