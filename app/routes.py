@@ -15,5 +15,5 @@ def info():
     return jsonify({
         'app': 'Flask Demo App',
         'version': '1.0.0',
-        'description': 'A simple Flask app with CI/CD to Azure'
+        'description': 'A simple Flask app with CI/CD to Azure testing'
     })
