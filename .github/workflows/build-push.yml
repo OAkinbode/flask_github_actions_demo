@@ -2,17 +2,37 @@ name: Build & Push Flask Docker Image to ACR
 
 on:
   push:
-    branches: [main] # or your trigger branch
-  workflow_dispatch: # allows manual run
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  id-token: write # required for OIDC
+  id-token: write
   contents: read
 
 jobs:
-  build-and-push:
+  # 1. Added a test job to verify the code before building
+  test:
     runs-on: ubuntu-latest
-    environment: production # ← matches your GitHub env name & Azure federation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # If you don't have pytest in requirements, uncomment the line below:
+          # pip install pytest
+      - name: Run Tests
+        run: pytest
+
+  # 2. The build and push job now "needs" the test job to pass
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout code
@@ -35,13 +55,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile # adjust if your Dockerfile is elsewhere
+          file: ./Dockerfile
           push: true
+          # Fixed: Removed the inline comment that was causing the build failure
           tags: |
             ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:${{ github.sha }}
-            ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:latest     # optional :latest tag
+            ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:latest
 
-      # Optional: logout (good hygiene, though not strictly needed)
       - name: Logout from ACR
         if: always()
         run: docker logout ${{ secrets.ACR_NAME }}.azurecr.io
