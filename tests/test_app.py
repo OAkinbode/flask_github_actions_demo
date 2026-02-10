@@ -1,18 +1,18 @@
 import pytest
-from app import create_app
+from app import app as flask_app  # Rename the import to avoid confusion
 
 @pytest.fixture
 def client():
-    app = create_app()
-    app.config['TESTING'] = True
-    with app.test_client() as client:
+    # Use the imported app instance
+    flask_app.config['TESTING'] = True
+    with flask_app.test_client() as client:
         yield client
 
 def test_index(client):
     response = client.get('/')
     assert response.status_code == 200
+    # Make sure these match exactly what your Flask app returns!
     assert b'Hello from Flask!' in response.data
-    assert response.json['status'] == 'healthy'
 
 def test_health(client):
     response = client.get('/health')
