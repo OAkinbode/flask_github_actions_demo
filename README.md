@@ -40,23 +40,27 @@ my-flask-app/
 ### Setup
 
 1. Clone the repository:
+
 ```bash
 git clone <your-repo-url>
 cd my-flask-app
 ```
 
 2. Create a virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. Run the application:
+
 ```bash
 python app.py
 ```
@@ -76,6 +80,7 @@ pytest
 ```
 
 With coverage:
+
 ```bash
 pytest --cov=app --cov-report=term-missing
 ```
@@ -83,11 +88,13 @@ pytest --cov=app --cov-report=term-missing
 ## Docker
 
 ### Build the image:
+
 ```bash
 docker build -t flask-app .
 ```
 
 ### Run the container:
+
 ```bash
 docker run -p 5000:5000 flask-app
 ```
@@ -96,17 +103,19 @@ docker run -p 5000:5000 flask-app
 
 ### Prerequisites
 
-1. Azure account with active subscription
+1. Azure account with active subscription(s)
 2. Azure CLI installed
 
 ### Setup Steps
 
 1. **Create Resource Group:**
+
 ```bash
 az group create --name flask-app-rg --location eastus
 ```
 
 2. **Create Azure Container Registry:**
+
 ```bash
 az acr create \
   --resource-group flask-app-rg \
@@ -116,11 +125,13 @@ az acr create \
 ```
 
 3. **Get ACR credentials:**
+
 ```bash
 az acr credential show --name myflaskapp
 ```
 
 4. **Create Service Principal for GitHub Actions:**
+
 ```bash
 az ad sp create-for-rbac \
   --name "github-actions-flask-app" \
@@ -159,10 +170,10 @@ Update these environment variables in `.github/workflows/deploy.yml`:
 
 ```yaml
 env:
-  AZURE_CONTAINER_REGISTRY: myflaskapp  # Your ACR name
-  AZURE_RESOURCE_GROUP: flask-app-rg    # Your resource group
-  CONTAINER_NAME: flask-app             # Your container name
-  IMAGE_NAME: flask-web-app             # Your image name
+  AZURE_CONTAINER_REGISTRY: myflaskapp # Your ACR name
+  AZURE_RESOURCE_GROUP: flask-app-rg # Your resource group
+  CONTAINER_NAME: flask-app # Your container name
+  IMAGE_NAME: flask-web-app # Your image name
 ```
 
 ## Deployment
@@ -176,6 +187,7 @@ git push origin main
 ```
 
 The GitHub Actions workflow will automatically:
+
 - Run tests
 - Build and push Docker image
 - Deploy to Azure Container Instances
@@ -184,11 +196,13 @@ The GitHub Actions workflow will automatically:
 ## Monitoring
 
 After deployment, access your application at:
+
 ```
 http://{CONTAINER_NAME}-{github-sha}.eastus.azurecontainer.io:5000
 ```
 
 Check application health:
+
 ```bash
 curl http://your-app-url/health
 ```
