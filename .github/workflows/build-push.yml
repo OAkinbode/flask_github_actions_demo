@@ -1,4 +1,4 @@
-name: Build & Push Flask Docker Image to ACR
+name: Build & Push Flask Docker Image to Docker Hub
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
@@ -18,18 +17,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to Azure (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Log in to ACR
-        run: az acr login --name ${{ secrets.ACR_NAME }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -38,9 +33,9 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:${{ github.sha }}
-            ${{ secrets.ACR_NAME }}.azurecr.io/flask-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/flask-app:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/flask-app:latest
 
-      - name: Logout from ACR
+      - name: Logout from Docker Hub
         if: always()
-        run: docker logout ${{ secrets.ACR_NAME }}.azurecr.io
+        run: docker logout
