@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify
 
 main_bp = Blueprint('main', __name__)
 
+# Define routes for the main blueprint
+
 @main_bp.route('/')
 def index():
     return jsonify({'message': 'Hello from Flask!', 'status': 'healthy'})
