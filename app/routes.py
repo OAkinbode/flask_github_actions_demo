@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 
 main_bp = Blueprint('main', __name__)
 
-# Define routes for the main blueprint
+# Define routes for the main blueprints
 
 @main_bp.route('/')
 def index():
